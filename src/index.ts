@@ -2,6 +2,8 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { PrismaClient } from "@prisma/client";
+import chapaRouter from "./routes/chapaRoute";
+import { globalErrorHandler } from "./middleware/errorHandler";
 
 dotenv.config();
 
@@ -16,23 +18,23 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.use("/api/v1", chapaRouter);
+
 const PORT = process.env.PORT || 5000;
 
 app.get("/", (req, res) => {
   res.json({ message: "Backend is running!" });
 });
 
-app.get("/test-db", async (req, res) => {
-  try {
-    // Test database connection by counting admins
-    const adminCount = await prisma.admin.count();
-    res.json({ message: "Database connected!", adminCount });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ error: "Database connection failed", details: error.message });
-  }
+// catch-all for undefined routes
+app.all("*", (req, res, next) => {
+  res
+    .status(404)
+    .json({ status: "fail", message: `Cannot find ${req.originalUrl}` });
 });
+
+// global error handling middleware
+app.use(globalErrorHandler);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
