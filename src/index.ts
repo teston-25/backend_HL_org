@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { PrismaClient } from "@prisma/client";
 import chapaRouter from "./routes/chapaRoute";
+import adminRouter from "./routes/adminRoute";
 import { globalErrorHandler } from "./middleware/errorHandler";
 
 dotenv.config();
@@ -19,6 +20,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/v1", chapaRouter);
+app.use("/api/v1/admin", adminRouter);
 
 const PORT = process.env.PORT || 5000;
 
