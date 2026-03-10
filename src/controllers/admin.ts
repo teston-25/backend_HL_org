@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { PrismaClient } from "@prisma/client";
+import prisma from "../config/prisma";
 import catchAsync from "../services/catchAsync";
 import AppError from "../services/AppError";
 
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient();
 
 interface AuthRequest extends Request {
   admin?: {
@@ -17,10 +17,6 @@ interface AuthRequest extends Request {
 
 export const login = catchAsync(async (req: Request, res: Response) => {
   const { email, password } = req.body;
-
-  if (!email || !password) {
-    throw new AppError("Email and password are required", 400);
-  }
 
   const admin = await prisma.admin.findUnique({ where: { email } });
   if (!admin) {
@@ -74,10 +70,6 @@ export const createAdmin = catchAsync(async (req: Request, res: Response) => {
 
   if (!email || !password) {
     throw new AppError("Email and password are required", 400);
-  }
-
-  if (!["ADMIN", "SUPER_ADMIN"].includes(role)) {
-    throw new AppError("Invalid role", 400);
   }
 
   // Prevent creating multiple Super Admins
@@ -215,3 +207,17 @@ export const updateMyPassword = catchAsync(
     });
   },
 );
+
+export const getNews = catchAsync(async (req: Request, res: Response) => {
+  res.json({ status: "success", data: { news: [] } });
+});
+
+export const createNews = catchAsync(async (req: Request, res: Response) => {
+  // Placeholder implementation
+  res.status(201).json({ status: "success", data: { news: null } });
+});
+
+export const updateNews = catchAsync(async (req: Request, res: Response) => {
+  // Placeholder implementation
+  res.json({ status: "success", data: { news: null } });
+});
