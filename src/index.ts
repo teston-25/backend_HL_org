@@ -2,8 +2,13 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { PrismaClient } from "@prisma/client";
+
 import chapaRouter from "./routes/chapaRoute";
 import adminRouter from "./routes/adminRoute";
+import newsRouter from "./routes/newsRoute";
+import donationRouter from "./routes/donationRoute";
+import contactRouter from "./routes/contactRoute";
+
 import { globalErrorHandler } from "./middleware/errorHandler";
 
 dotenv.config();
@@ -21,11 +26,14 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/v1", chapaRouter);
 app.use("/api/v1/admin", adminRouter);
+app.use("/api/v1/news", newsRouter);
+app.use("/api/v1/admin/donations", donationRouter);
+app.use("/api/v1/contact-us", contactRouter);
 
 const PORT = process.env.PORT || 5000;
 
 app.get("/", (req, res) => {
-  res.json({ message: "Backend is running!" });
+  res.json({ message: "✅Backend is running!" });
 });
 
 // catch-all for undefined routes

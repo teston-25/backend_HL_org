@@ -19,20 +19,16 @@ router.post("/login", validate(loginSchema), adminController.login);
 router.use(authenticate);
 
 // Admin management (Super Admin only)
-router.get("/admins", requireRole("SUPER_ADMIN"), adminController.getAdmins);
-router.post(
-  "/admins",
-  validate(createAdminSchema),
-  adminController.createAdmin,
-);
+router.get("/", requireRole("SUPER_ADMIN"), adminController.getAdmins);
+router.post("/", validate(createAdminSchema), adminController.createAdmin);
 router.put(
-  "/admins/:id",
+  "/:id",
   requireRole("SUPER_ADMIN"),
   validate(updateAdminSchema, "params"),
   adminController.updateAdmin,
 );
 router.delete(
-  "/admins/:id",
+  "/:id",
   requireRole("SUPER_ADMIN"),
   validate(adminIdParamSchema, "params"),
   adminController.deleteAdmin,
@@ -45,13 +41,9 @@ router.put(
   adminController.updateMyPassword,
 );
 
-// Other admin endpoints (to be implemented)
-// router.get("/news", adminController.getNews); // placeholder
-// router.post("/news", adminController.createNews); // placeholder
-// router.put("/news/:id", adminController.updateNews); // placeholder
-// router.delete("/news/:id", adminController.deleteNews); // placeholder
-// router.get("/contacts", adminController.getContacts); // placeholder
-// router.get("/donations", adminController.getDonations); // placeholder
-// Add more as needed
+// other super_admin and admin endpoints for managing contacts
+router.get("/contacts", adminController.getAllContacts);
+router.get("/contacts/:id", adminController.getContact);
+router.delete("/contacts/:id", adminController.deleteContact);
 
 export default router;

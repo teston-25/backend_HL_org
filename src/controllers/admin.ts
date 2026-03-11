@@ -5,8 +5,6 @@ import prisma from "../config/prisma";
 import catchAsync from "../services/catchAsync";
 import AppError from "../services/AppError";
 
-// const prisma = new PrismaClient();
-
 interface AuthRequest extends Request {
   admin?: {
     id: number;
@@ -208,16 +206,66 @@ export const updateMyPassword = catchAsync(
   },
 );
 
-export const getNews = catchAsync(async (req: Request, res: Response) => {
-  res.json({ status: "success", data: { news: [] } });
+// contact management for admin panel
+export const getAllContacts = catchAsync(
+  async (req: Request, res: Response) => {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 20;
+    const skip = (page - 1) * limit;
+
+    // Get total count for pagination
+    const total = await prisma.contact.count();
+
+    // Get paginated contacts
+    const contacts = await prisma.contact.findMany({
+      orderBy: { created_at: "desc" },
+      skip,
+      take: limit,
+    });
+
+    res.json({
+      status: "success",
+      data: {
+        contacts,
+        pagination: {
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit),
+          hasNextPage: page < Math.ceil(total / limit),
+          hasPrevPage: page > 1,
+        },
+      },
+    });
+  },
+);
+
+export const getContact = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  const contact = await prisma.contact.findUnique({
+    where: { id: parseInt(id) },
+  });
+
+  if (!contact) {
+    throw new AppError("Contact not found", 404);
+  }
+
+  res.json({
+    status: "success",
+    data: { contact },
+  });
 });
 
-export const createNews = catchAsync(async (req: Request, res: Response) => {
-  // Placeholder implementation
-  res.status(201).json({ status: "success", data: { news: null } });
-});
+export const deleteContact = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
 
-export const updateNews = catchAsync(async (req: Request, res: Response) => {
-  // Placeholder implementation
-  res.json({ status: "success", data: { news: null } });
+  await prisma.contact.delete({
+    where: { id: parseInt(id) },
+  });
+
+  res.status(204).json({
+    status: "success",
+    message: "Contact deleted successfully",
+  });
 });

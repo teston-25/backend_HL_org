@@ -34,14 +34,19 @@ export const authenticate = (
   }
 };
 
-export const requireRole = (role: string) => {
+export const requireRole = (roles: string | string[]) => {
   return (req: AuthRequest, res: Response, next: NextFunction) => {
     if (!req.admin) {
       return next(new AppError("Authentication required", 401));
     }
-    if (req.admin.role !== role) {
+
+    // Convert single role to array for consistent handling
+    const allowedRoles = Array.isArray(roles) ? roles : [roles];
+
+    if (!allowedRoles.includes(req.admin.role)) {
       return next(new AppError("Insufficient permissions", 403));
     }
+
     next();
   };
 };
