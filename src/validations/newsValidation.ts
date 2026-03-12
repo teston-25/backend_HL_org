@@ -35,7 +35,6 @@ export const newsSchema = z.object({
 
   published_at: z
     .string()
-    .datetime("Must be a valid date")
     .optional()
     .nullable()
     .transform((val) => (val ? new Date(val) : null)),
@@ -43,7 +42,6 @@ export const newsSchema = z.object({
 
 // For creating news (all fields optional except required ones)
 export const createNewsSchema = newsSchema.extend({
-  // Make sure required fields are present
   title: newsSchema.shape.title,
   content: newsSchema.shape.content,
 });

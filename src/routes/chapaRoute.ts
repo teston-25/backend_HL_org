@@ -6,7 +6,7 @@ import {
   verifyPaymentSchema,
   callbackSchema,
   getTransactionSchema,
-} from "../../validations/paymentValidation";
+} from "../validations/paymentValidation";
 
 const router = express.Router();
 

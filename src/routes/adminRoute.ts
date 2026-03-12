@@ -8,7 +8,7 @@ import {
   updateAdminSchema,
   updatePasswordSchema,
   adminIdParamSchema,
-} from "../../validations/adminvalidation";
+} from "../validations/adminvalidation";
 
 const router = express.Router();
 

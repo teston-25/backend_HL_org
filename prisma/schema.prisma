@@ -59,12 +59,19 @@ model News {
 
 model Emergency {
   id             Int      @id @default(autoincrement())
-  title          String
-  description    String
-  status         String
-  affected_count Int?
-  raised_amount  Float?
+  title          String   
+  slug           String   @unique
+  location       String   
+  description    String   
+  status         String   
+  affected_count Int?     
+  raised_amount  Float?   
+  goal_amount    Float?   
+  aid_deployed   Float?   
+  aid_unit       String?  
+  image_url      String?  
   created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
 }
 
 model BeneficiaryStats {

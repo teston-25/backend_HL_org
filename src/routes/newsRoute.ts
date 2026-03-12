@@ -5,7 +5,7 @@ import { validate } from "../../src/middleware/validate";
 import {
   createNewsSchema,
   updateNewsSchema,
-} from "../../validations/newsValidation";
+} from "../validations/newsValidation";
 
 const router = express.Router();
 

@@ -8,6 +8,7 @@ import adminRouter from "./routes/adminRoute";
 import newsRouter from "./routes/newsRoute";
 import donationRouter from "./routes/donationRoute";
 import contactRouter from "./routes/contactRoute";
+import emergenciesRouter from "./routes/emergenciesRoute";
 
 import { globalErrorHandler } from "./middleware/errorHandler";
 
@@ -29,6 +30,7 @@ app.use("/api/v1/admin", adminRouter);
 app.use("/api/v1/news", newsRouter);
 app.use("/api/v1/admin/donations", donationRouter);
 app.use("/api/v1/contact-us", contactRouter);
+app.use("/api/v1/emergencies", emergenciesRouter);
 
 const PORT = process.env.PORT || 5000;
 

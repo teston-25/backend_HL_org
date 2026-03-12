@@ -147,7 +147,7 @@ export const deleteNews = catchAsync(async (req: Request, res: Response) => {
     where: { id: parseInt(id) },
   });
 
-  res.json({
+  res.status(204).json({
     status: "success",
     message: "News deleted successfully",
   });
