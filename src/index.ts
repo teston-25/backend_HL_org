@@ -6,9 +6,9 @@ import { PrismaClient } from "@prisma/client";
 import chapaRouter from "./routes/chapaRoute";
 import adminRouter from "./routes/adminRoute";
 import newsRouter from "./routes/newsRoute";
-import donationRouter from "./routes/donationRoute";
 import contactRouter from "./routes/contactRoute";
 import emergenciesRouter from "./routes/emergenciesRoute";
+import beneficiaryStatsRouter from "./routes/beneficiaryStatsRoute";
 
 import { globalErrorHandler } from "./middleware/errorHandler";
 
@@ -25,12 +25,12 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/api/v1", chapaRouter);
+app.use("/api/v1/donation", chapaRouter);
 app.use("/api/v1/admin", adminRouter);
 app.use("/api/v1/news", newsRouter);
-app.use("/api/v1/admin/donations", donationRouter);
-app.use("/api/v1/contact-us", contactRouter);
+app.use("/api/v1/contacts", contactRouter);
 app.use("/api/v1/emergencies", emergenciesRouter);
+app.use("/api/v1/beneficiary-stats", beneficiaryStatsRouter);
 
 const PORT = process.env.PORT || 5000;
 
