@@ -27,12 +27,19 @@ import {
   updateEmergencySchema,
 } from "../validations/emergencyValidation";
 import { updateBeneficiaryStatsSchema } from "../validations/beneficiaryStatsValidation";
+import { adminLoginLimiter } from "../services/loginRateLimiter";
 
 const router = express.Router();
 const upload = multer({ dest: "uploads/" });
 
 // --- Public ---
-router.post("/login", validate(loginSchema), adminController.login);
+router.post(
+  "/login",
+  adminLoginLimiter,
+  validate(loginSchema),
+  adminController.login,
+);
+// router.post("/", validate(createAdminSchema), adminController.createAdmin);
 
 // --- Protected ---
 router.use(authenticate);

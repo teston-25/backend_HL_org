@@ -2,6 +2,7 @@ import axios from "axios";
 import crypto from "crypto";
 import AppError from "./AppError";
 import prisma from "../config/prisma";
+import { sendDonationConfirmation } from "./donationEmail";
 
 const CHAPA_SECRET_KEY = process.env.CHAPA_SECRET_KEY!;
 const CHAPA_API_URL = "https://api.chapa.co/v1";
@@ -52,20 +53,20 @@ export async function initPayment(data: any) {
     "customization[description]": description || "Complete your payment",
   };
 
-  // const response = await axios.post(
-  //   `${CHAPA_API_URL}/transaction/initialize`,
-  //   transactionData,
-  //   {
-  //     headers: {
-  //       Authorization: `Bearer ${CHAPA_SECRET_KEY}`,
-  //       "Content-Type": "application/json",
-  //     },
-  //   }
-  // );
+  const response = await axios.post(
+    `${CHAPA_API_URL}/transaction/initialize`,
+    transactionData,
+    {
+      headers: {
+        Authorization: `Bearer ${CHAPA_SECRET_KEY}`,
+        "Content-Type": "application/json",
+      },
+    },
+  );
 
   return {
-    // checkout_url: response.data.data.checkout_url,
-    checkout_url: "https://mock-checkout-url.com",
+    checkout_url: response.data.data.checkout_url,
+    // checkout_url: "https://mock-checkout-url.com",
     tx_ref,
   };
 }
@@ -97,11 +98,26 @@ export async function verifyPayment(tx_ref: string) {
 
 export async function handleCallback(body: any) {
   const { trx_ref, ref_id, status } = body;
+
   if (status === "success" && trx_ref) {
-    await prisma.donation.update({
+    const donation = await prisma.donation.update({
       where: { tx_ref: trx_ref },
-      data: { status: "completed", ref_id },
+      data: {
+        status: "completed",
+        ref_id,
+      },
     });
+
+    try {
+      await sendDonationConfirmation(
+        donation.email,
+        donation.first_name,
+        donation.amount,
+        donation.tx_ref,
+      );
+    } catch (error) {
+      console.error("Donation email failed:", error);
+    }
   }
 }
 

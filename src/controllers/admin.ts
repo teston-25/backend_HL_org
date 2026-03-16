@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import prisma from "../config/prisma";
 import catchAsync from "../services/catchAsync";
 import AppError from "../services/AppError";
+import { createAuditLog } from "../services/auditLog";
 
 interface AuthRequest extends Request {
   admin?: {
@@ -31,6 +32,8 @@ export const login = catchAsync(async (req: Request, res: Response) => {
     process.env.JWT_SECRET!,
     { expiresIn: "1d" },
   );
+
+  await createAuditLog(admin.id, "LOGIN", "AUTH", admin.id, "Admin logged in");
 
   res.json({
     status: "success",
@@ -63,71 +66,91 @@ export const getAdmins = catchAsync(async (req: AuthRequest, res: Response) => {
   });
 });
 
-export const createAdmin = catchAsync(async (req: Request, res: Response) => {
-  const { email, password, role = "ADMIN" } = req.body;
+export const createAdmin = catchAsync(
+  async (req: AuthRequest, res: Response) => {
+    const { email, password, role = "ADMIN" } = req.body;
 
-  if (!email || !password) {
-    throw new AppError("Email and password are required", 400);
-  }
-
-  // Prevent creating multiple Super Admins
-  if (role === "SUPER_ADMIN") {
-    const existingSuperAdmin = await prisma.admin.findFirst({
-      where: { role: "SUPER_ADMIN" },
-    });
-    if (existingSuperAdmin) {
-      throw new AppError("Only one Super Admin is allowed", 400);
+    if (!email || !password) {
+      throw new AppError("Email and password are required", 400);
     }
-  }
 
-  const hashedPassword = await bcrypt.hash(password, 12);
-
-  const admin = await prisma.admin.create({
-    data: { email, password_hash: hashedPassword, role },
-    select: {
-      id: true,
-      email: true,
-      role: true,
-      created_at: true,
-      updated_at: true,
-    },
-  });
-
-  res.status(201).json({
-    status: "success",
-    data: { admin },
-  });
-});
-
-export const updateAdmin = catchAsync(async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const { email, role } = req.body;
-
-  if (!["ADMIN", "SUPER_ADMIN"].includes(role)) {
-    throw new AppError("Invalid role", 400);
-  }
-
-  // Prevent creating multiple Super Admins
-  if (role === "SUPER_ADMIN") {
-    const existingSuperAdmin = await prisma.admin.findFirst({
-      where: { role: "SUPER_ADMIN" },
-    });
-    if (existingSuperAdmin && existingSuperAdmin.id !== parseInt(id)) {
-      throw new AppError("Only one Super Admin is allowed", 400);
+    // Prevent creating multiple Super Admins
+    if (role === "SUPER_ADMIN") {
+      const existingSuperAdmin = await prisma.admin.findFirst({
+        where: { role: "SUPER_ADMIN" },
+      });
+      if (existingSuperAdmin) {
+        throw new AppError("Only one Super Admin is allowed", 400);
+      }
     }
-  }
 
-  const admin = await prisma.admin.update({
-    where: { id: parseInt(id) },
-    data: { email, role },
-    select: { id: true, email: true, role: true, updated_at: true },
-  });
+    const hashedPassword = await bcrypt.hash(password, 12);
 
-  res.json({
-    status: "success",
-    data: { admin },
-  });
-});
+    const admin = await prisma.admin.create({
+      data: { email, password_hash: hashedPassword, role },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        created_at: true,
+        updated_at: true,
+      },
+    });
+
+    await createAuditLog(
+      req.admin!.id,
+      "CREATE",
+      "ADMIN",
+      admin.id,
+      "Created new admin account",
+    );
+
+    res.status(201).json({
+      status: "success",
+      data: { admin },
+    });
+  },
+);
+
+export const updateAdmin = catchAsync(
+  async (req: AuthRequest, res: Response) => {
+    const { id } = req.params;
+    const { email, role } = req.body;
+
+    if (!["ADMIN", "SUPER_ADMIN"].includes(role)) {
+      throw new AppError("Invalid role", 400);
+    }
+
+    // Prevent creating multiple Super Admins
+    if (role === "SUPER_ADMIN") {
+      const existingSuperAdmin = await prisma.admin.findFirst({
+        where: { role: "SUPER_ADMIN" },
+      });
+      if (existingSuperAdmin && existingSuperAdmin.id !== parseInt(id)) {
+        throw new AppError("Only one Super Admin is allowed", 400);
+      }
+    }
+
+    const admin = await prisma.admin.update({
+      where: { id: parseInt(id) },
+      data: { email, role },
+      select: { id: true, email: true, role: true, updated_at: true },
+    });
+
+    await createAuditLog(
+      req.admin!.id,
+      "UPDATE",
+      "ADMIN",
+      admin.id,
+      "Updated admin account",
+    );
+
+    res.json({
+      status: "success",
+      data: { admin },
+    });
+  },
+);
 
 export const deleteAdmin = catchAsync(
   async (req: AuthRequest, res: Response) => {
@@ -157,6 +180,14 @@ export const deleteAdmin = catchAsync(
     }
 
     await prisma.admin.delete({ where: { id: adminId } });
+
+    await createAuditLog(
+      req.admin!.id,
+      "DELETE",
+      "ADMIN",
+      adminId,
+      "Deleted admin account",
+    );
 
     res.status(204).json({
       status: "success",
