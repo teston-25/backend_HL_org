@@ -1,0 +1,374 @@
+openapi: 3.0.0
+
+info:
+  title: Backend HL Organization API
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:5000/api/v1
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: Admin
+  - name: Authentication
+  - name: Contacts
+  - name: Donations
+  - name: Payments
+  - name: News
+  - name: Emergencies
+  - name: Beneficiary Stats
+  - name: Transparency
+  - name: Public
+
+paths:
+  /:
+    get:
+      tags: [Public]
+      summary: API health check
+      responses:
+        "200":
+          description: API is running
+
+  /admin/login:
+    post:
+      tags: [Authentication]
+      summary: Admin login
+      requestBody:
+        required: true
+      responses:
+        "200":
+          description: Login successful
+        "400":
+          description: Error
+
+  /admin:
+    get:
+      tags: [Admin]
+      summary: Get all admins
+      responses:
+        "200":
+          description: List of admins
+        "400":
+          description: Error
+    post:
+      tags: [Admin]
+      summary: Create admin
+      requestBody:
+        required: true
+      responses:
+        "201":
+          description: Admin created
+        "400":
+          description: Error
+
+  /admin/{id}:
+    put:
+      tags: [Admin]
+      summary: Update admin
+      requestBody:
+        required: true
+      responses:
+        "200":
+          description: Admin updated
+        "400":
+          description: Error
+    delete:
+      tags: [Admin]
+      summary: Delete admin
+      responses:
+        "204":
+          description: Admin deleted
+        "400":
+          description: Error
+
+  /admin/password/me:
+    put:
+      tags: [Admin]
+      summary: Update password
+      requestBody:
+        required: true
+      responses:
+        "200":
+          description: Password updated
+        "400":
+          description: Error
+
+  /contacts:
+    post:
+      tags: [Contacts]
+      summary: Submit contact
+      requestBody:
+        required: true
+      responses:
+        "201":
+          description: Contact created
+        "400":
+          description: Error
+
+  /admin/contacts:
+    get:
+      tags: [Contacts]
+      summary: Get all contacts
+      responses:
+        "200":
+          description: Contacts list
+        "400":
+          description: Error
+
+  /admin/contacts/{id}:
+    get:
+      tags: [Contacts]
+      summary: Get contact by ID
+      responses:
+        "200":
+          description: Contact details
+        "400":
+          description: Error
+    delete:
+      tags: [Contacts]
+      summary: Delete contact
+      responses:
+        "204":
+          description: Contact deleted
+        "400":
+          description: Error
+
+  /admin/donations:
+    get:
+      tags: [Donations]
+      summary: Get all donations
+      responses:
+        "200":
+          description: Donations list
+        "400":
+          description: Error
+
+  /admin/donations/stats:
+    get:
+      tags: [Donations]
+      summary: Donation stats
+      responses:
+        "200":
+          description: Stats data
+        "400":
+          description: Error
+
+  /donation/initialize-payment:
+    post:
+      tags: [Payments]
+      summary: Initialize payment
+      requestBody:
+        required: true
+      responses:
+        "200":
+          description: Payment initialized
+        "400":
+          description: Error
+
+  /donation/verify-payment/{tx_ref}:
+    get:
+      tags: [Payments]
+      summary: Verify payment
+      responses:
+        "200":
+          description: Payment verified
+        "400":
+          description: Error
+
+  /donation/payment-callback:
+    post:
+      tags: [Payments]
+      summary: Payment callback
+      requestBody:
+        required: true
+      responses:
+        "200":
+          description: Callback received
+        "400":
+          description: Error
+
+  /donation/transaction-status/{tx_ref}:
+    get:
+      tags: [Payments]
+      summary: Transaction status
+      responses:
+        "200":
+          description: Transaction info
+        "400":
+          description: Error
+
+  /news:
+    get:
+      tags: [News]
+      summary: Get all news
+      responses:
+        "200":
+          description: News list
+        "400":
+          description: Error
+
+  /news/{id}:
+    get:
+      tags: [News]
+      summary: Get news by ID
+      responses:
+        "200":
+          description: News details
+        "400":
+          description: Error
+
+  /admin/news:
+    post:
+      tags: [News]
+      summary: Create news
+      requestBody:
+        required: true
+      responses:
+        "201":
+          description: News created
+        "400":
+          description: Error
+
+  /admin/news/{id}:
+    put:
+      tags: [News]
+      summary: Update news
+      requestBody:
+        required: true
+      responses:
+        "200":
+          description: News updated
+        "400":
+          description: Error
+    delete:
+      tags: [News]
+      summary: Delete news
+      responses:
+        "204":
+          description: News deleted
+        "400":
+          description: Error
+
+  /emergencies:
+    get:
+      tags: [Emergencies]
+      summary: Get emergencies
+      responses:
+        "200":
+          description: Emergency list
+        "400":
+          description: Error
+
+  /emergencies/active:
+    get:
+      tags: [Emergencies]
+      summary: Get active emergencies
+      responses:
+        "200":
+          description: Active emergencies
+        "400":
+          description: Error
+
+  /emergencies/{id}:
+    get:
+      tags: [Emergencies]
+      summary: Get emergency by ID
+      responses:
+        "200":
+          description: Emergency details
+        "400":
+          description: Error
+
+  /admin/emergencies:
+    post:
+      tags: [Emergencies]
+      summary: Create emergency
+      requestBody:
+        required: true
+      responses:
+        "201":
+          description: Emergency created
+        "400":
+          description: Error
+
+  /admin/emergencies/{id}:
+    put:
+      tags: [Emergencies]
+      summary: Update emergency
+      requestBody:
+        required: true
+      responses:
+        "200":
+          description: Emergency updated
+        "400":
+          description: Error
+    delete:
+      tags: [Emergencies]
+      summary: Delete emergency
+      responses:
+        "204":
+          description: Emergency deleted
+        "400":
+          description: Error
+
+  /beneficiary-stats:
+    get:
+      tags: [Beneficiary Stats]
+      summary: Get beneficiary stats
+      responses:
+        "200":
+          description: Stats data
+        "400":
+          description: Error
+
+  /admin/beneficiary-stats:
+    put:
+      tags: [Beneficiary Stats]
+      summary: Update beneficiary stats
+      requestBody:
+        required: true
+      responses:
+        "200":
+          description: Stats updated
+        "400":
+          description: Error
+
+  /admin/transparency:
+    post:
+      tags: [Transparency]
+      summary: Upload transparency file
+      requestBody:
+        required: true
+      responses:
+        "201":
+          description: File uploaded
+        "400":
+          description: Error
+
+  /admin/transparency/{id}:
+    put:
+      tags: [Transparency]
+      summary: Update transparency file
+      requestBody:
+        required: true
+      responses:
+        "200":
+          description: File updated
+        "400":
+          description: Error
+    delete:
+      tags: [Transparency]
+      summary: Delete transparency file
+      responses:
+        "200":
+          description: File deleted
+        "400":
+          description: Error

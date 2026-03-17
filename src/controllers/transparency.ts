@@ -140,7 +140,7 @@ export const deleteTransparencyFile = catchAsync(
       where: { id },
     });
 
-    res.status(200).json({
+    res.status(204).json({
       status: "success",
       message: "File deleted successfully",
     });
