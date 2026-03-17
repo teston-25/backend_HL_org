@@ -4,7 +4,11 @@ import * as donationController from "../controllers/donation";
 import * as newsController from "../controllers/news";
 import * as emergenciesController from "../controllers/emergencies";
 import * as beneficiaryController from "../controllers/beneficiaryStats";
-import { uploadTransparencyPDF } from "../controllers/transparency";
+import {
+  deleteTransparencyFile,
+  updateTransparencyFile,
+  uploadTransparencyPDF,
+} from "../controllers/transparency";
 import multer from "multer";
 
 import { authenticate, requireRole } from "../middleware/auth";
@@ -109,6 +113,17 @@ router.post(
   requireRole(["SUPER_ADMIN", "ADMIN"]),
   upload.single("file"),
   uploadTransparencyPDF,
+);
+router.put(
+  "/transparency/:id",
+  requireRole(["SUPER_ADMIN", "ADMIN"]),
+  upload.single("file"),
+  updateTransparencyFile,
+);
+router.delete(
+  "/transparency/:id",
+  requireRole(["SUPER_ADMIN", "ADMIN"]),
+  deleteTransparencyFile,
 );
 
 export default router;
