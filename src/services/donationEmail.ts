@@ -8,11 +8,19 @@ export const sendDonationConfirmation = async (
 ) => {
   const subject = "Thank You for Your Donation ❤️";
 
+  function escapeHtml(str: string): string {
+    return str
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
   const html = `
     <div style="font-family: Arial; line-height:1.6;">
       <h2>Thank you for your donation ❤️</h2>
 
-      <p>Hello ${firstName},</p>
+      <p>Hello ${escapeHtml(firstName)},</p>
 
       <p>Your donation has been successfully received.</p>
 

@@ -15,14 +15,14 @@ export const verifyPayment = catchAsync(async (req: Request, res: Response) => {
 
 export const paymentCallback = catchAsync(
   async (req: Request, res: Response) => {
-    chapaService.handleCallback(req.body);
+    await chapaService.handleCallback(req.body);
     res.status(200).send("Callback received");
   },
 );
 
 export const transactionStatus = catchAsync(
   async (req: Request, res: Response) => {
-    const transaction = chapaService.getTransaction(req.params.tx_ref);
+    const transaction = await chapaService.getTransaction(req.params.tx_ref);
     res.json({ success: true, data: transaction });
   },
 );

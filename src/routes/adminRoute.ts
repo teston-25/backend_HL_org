@@ -32,9 +32,20 @@ import {
 } from "../validations/emergencyValidation";
 import { updateBeneficiaryStatsSchema } from "../validations/beneficiaryStatsValidation";
 import { adminLoginLimiter } from "../services/loginRateLimiter";
+import AppError from "../services/AppError";
 
 const router = express.Router();
-const upload = multer({ dest: "uploads/" });
+const upload = multer({
+  dest: "uploads/",
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype === "application/pdf") {
+      cb(null, true);
+    } else {
+      cb(new AppError("Only PDF files are allowed", 400) as any, false);
+    }
+  },
+});
 
 // --- Public ---
 router.post(
@@ -64,45 +75,86 @@ router.delete(
 );
 
 // --- Password update for all admins ---
-router.use(requireRole(["ADMIN", "SUPER_ADMIN"]));
+// router.use(requireRole(["ADMIN", "SUPER_ADMIN"]));
 router.get("/", adminController.getAdmins);
 router.put(
   "/password/me",
+  requireRole(["ADMIN", "SUPER_ADMIN"]),
   validate(updatePasswordSchema),
   adminController.updateMyPassword,
 );
 
 // --- Contacts (Admin + Super Admin) ---
-router.get("/contacts", adminController.getAllContacts);
-router.get("/contacts/:id", adminController.getContact);
-router.delete("/contacts/:id", adminController.deleteContact);
+router.get(
+  "/contacts",
+  requireRole(["ADMIN", "SUPER_ADMIN"]),
+  adminController.getAllContacts,
+);
+router.get(
+  "/contacts/:id",
+  requireRole(["ADMIN", "SUPER_ADMIN"]),
+  adminController.getContact,
+);
+router.delete(
+  "/contacts/:id",
+  requireRole(["ADMIN", "SUPER_ADMIN"]),
+  adminController.deleteContact,
+);
 
 // --- Donations ---
-router.get("/donations", donationController.getAllDonations);
-router.get("/donations/stats", donationController.getDonationStats);
+router.get(
+  "/donations",
+  requireRole(["ADMIN", "SUPER_ADMIN"]),
+  donationController.getAllDonations,
+);
+router.get(
+  "/donations/stats",
+  requireRole(["ADMIN", "SUPER_ADMIN"]),
+  donationController.getDonationStats,
+);
 
 // --- News ---
-router.post("/news", validate(createNewsSchema), newsController.createNews);
-router.put("/news/:id", validate(updateNewsSchema), newsController.updateNews);
-router.delete("/news/:id", newsController.deleteNews);
+router.post(
+  "/news",
+  requireRole(["ADMIN", "SUPER_ADMIN"]),
+  validate(createNewsSchema),
+  newsController.createNews,
+);
+router.put(
+  "/news/:id",
+  requireRole(["ADMIN", "SUPER_ADMIN"]),
+  validate(updateNewsSchema),
+  newsController.updateNews,
+);
+router.delete(
+  "/news/:id",
+  requireRole(["ADMIN", "SUPER_ADMIN"]),
+  newsController.deleteNews,
+);
 
 // --- Emergencies ---
 router.post(
   "/emergencies",
+  requireRole(["ADMIN", "SUPER_ADMIN"]),
   validate(createEmergencySchema),
   emergenciesController.createEmergency,
 );
 router.put(
   "/emergencies/:id",
+  requireRole(["ADMIN", "SUPER_ADMIN"]),
   validate(updateEmergencySchema),
   emergenciesController.updateEmergency,
 );
-router.delete("/emergencies/:id", emergenciesController.deleteEmergency);
+router.delete(
+  "/emergencies/:id",
+  requireRole(["ADMIN", "SUPER_ADMIN"]),
+  emergenciesController.deleteEmergency,
+);
 
 // --- Beneficiary stats ---
 router.put(
   "/beneficiary-stats",
-  requireRole(["SUPER_ADMIN", "ADMIN"]),
+  requireRole(["ADMIN", "SUPER_ADMIN"]),
   validate(updateBeneficiaryStatsSchema),
   beneficiaryController.updateBeneficiaryStats,
 );
@@ -110,19 +162,19 @@ router.put(
 // --- Transparency PDF ---
 router.post(
   "/transparency",
-  requireRole(["SUPER_ADMIN", "ADMIN"]),
+  requireRole(["ADMIN", "SUPER_ADMIN"]),
   upload.single("file"),
   uploadTransparencyPDF,
 );
 router.put(
   "/transparency/:id",
-  requireRole(["SUPER_ADMIN", "ADMIN"]),
+  requireRole(["ADMIN", "SUPER_ADMIN"]),
   upload.single("file"),
   updateTransparencyFile,
 );
 router.delete(
   "/transparency/:id",
-  requireRole(["SUPER_ADMIN", "ADMIN"]),
+  requireRole(["ADMIN", "SUPER_ADMIN"]),
   deleteTransparencyFile,
 );
 

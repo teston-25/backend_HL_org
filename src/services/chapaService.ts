@@ -47,7 +47,7 @@ export async function initPayment(data: any) {
     last_name,
     phone_number,
     tx_ref,
-    callback_url: `${process.env.BASE_URL}/api/payment-callback`,
+    callback_url: `${process.env.BASE_URL}/api/v1/donation/payment-callback`,
     return_url: `${process.env.BASE_URL}/payment-success`,
     "customization[title]": title || "Payment for services",
     "customization[description]": description || "Complete your payment",
@@ -99,7 +99,7 @@ export async function verifyPayment(tx_ref: string) {
 export async function handleCallback(body: any) {
   const { trx_ref, ref_id, status } = body;
 
-  if (status === "success" && trx_ref) {
+  if (status === "completed" && trx_ref) {
     const donation = await prisma.donation.update({
       where: { tx_ref: trx_ref },
       data: {

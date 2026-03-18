@@ -9,7 +9,7 @@ declare global {
 export const prisma =
   global.prisma ||
   new PrismaClient({
-    log: ["query"],
+    log: process.env.NODE_ENV === "development" ? ["query"] : ["error"],
   });
 
 // Store globally (only in dev) to prevent multiple instances

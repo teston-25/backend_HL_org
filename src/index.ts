@@ -1,9 +1,10 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import { PrismaClient } from "@prisma/client";
 import swaggerUi from "swagger-ui-express";
 import YAML from "yamljs";
+import helmet from "helmet";
+import env from "./config/env";
 
 import chapaRouter from "./routes/chapaRoute";
 import adminRouter from "./routes/adminRoute";
@@ -15,19 +16,20 @@ import beneficiaryStatsRouter from "./routes/beneficiaryStatsRoute";
 import { globalErrorHandler } from "./middleware/errorHandler";
 
 dotenv.config();
+env.validateEnv();
 
 const app = express();
-const prisma = new PrismaClient();
-
 const swaggerDocument = YAML.load("./swagger.yaml");
 
+app.use(helmet());
 app.use(
   cors({
     origin: process.env.CORS_ORIGIN || "http://localhost:5173",
+    credentials: true,
   }),
 );
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "10kb" }));
+app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 
 app.use(
   "/api-docs",
