@@ -35,7 +35,7 @@ export const verifyPaymentSchema = z.object({
 export const callbackSchema = z.object({
   trx_ref: z.string(),
   ref_id: z.string().optional(),
-  status: z.enum(["completed", "failed", "pending"]),
+  status: z.enum(["success", "failed", "pending"]),
 });
 
 export const getTransactionSchema = z.object({

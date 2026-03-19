@@ -99,7 +99,7 @@ export async function verifyPayment(tx_ref: string) {
 export async function handleCallback(body: any) {
   const { trx_ref, ref_id, status } = body;
 
-  if (status === "completed" && trx_ref) {
+  if (status === "success" && trx_ref) {
     const donation = await prisma.donation.update({
       where: { tx_ref: trx_ref },
       data: {

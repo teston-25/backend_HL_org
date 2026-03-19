@@ -1,3 +1,34 @@
-node_modules
-# Keep environment variables out of version control
-.env
+# Dependencies  
+node_modules/  
+  
+# Build output  
+dist/  
+  
+# Environment variables  
+.env  
+.env.local  
+.env.production  
+  
+# Prisma  
+prisma/*.db  
+prisma/*.db-journal  
+  
+# File uploads (temp files before Cloudinary upload)  
+uploads/  
+  
+# IDE / Editor  
+.vscode/  
+.idea/  
+*.swp  
+*.swo  
+  
+# OS files  
+.DS_Store  
+Thumbs.db  
+  
+# Logs  
+*.log  
+npm-debug.log*  
+  
+# TypeScript cache  
+*.tsbuildinfo

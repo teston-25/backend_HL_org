@@ -60,22 +60,27 @@ router.post(
 router.use(authenticate);
 
 // --- Admin management ---
-router.use(requireRole("SUPER_ADMIN"));
-router.post("/", validate(createAdminSchema), adminController.createAdmin);
+router.post(
+  "/",
+  requireRole("SUPER_ADMIN"),
+  validate(createAdminSchema),
+  adminController.createAdmin,
+);
 router.put(
   "/:id",
+  requireRole("SUPER_ADMIN"),
   validate(adminIdParamSchema, "params"),
   validate(updateAdminSchema),
   adminController.updateAdmin,
 );
 router.delete(
   "/:id",
+  requireRole("SUPER_ADMIN"),
   validate(adminIdParamSchema, "params"),
   adminController.deleteAdmin,
 );
 
 // --- Password update for all admins ---
-// router.use(requireRole(["ADMIN", "SUPER_ADMIN"]));
 router.get("/", adminController.getAdmins);
 router.put(
   "/password/me",
