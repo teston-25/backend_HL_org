@@ -7,6 +7,7 @@ import {
   callbackSchema,
   getTransactionSchema,
 } from "../validations/paymentValidation";
+import { verifyChapaWebhook } from "../middleware/webHook";
 
 const router = express.Router();
 
@@ -23,6 +24,7 @@ router.get(
 );
 router.post(
   "/payment-callback",
+  verifyChapaWebhook,
   validate(callbackSchema),
   chapaController.paymentCallback,
 );

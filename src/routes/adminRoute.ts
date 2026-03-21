@@ -81,7 +81,11 @@ router.delete(
 );
 
 // --- Password update for all admins ---
-router.get("/", adminController.getAdmins);
+router.get(
+  "/",
+  requireRole(["ADMIN", "SUPER_ADMIN"]),
+  adminController.getAdmins,
+);
 router.put(
   "/password/me",
   requireRole(["ADMIN", "SUPER_ADMIN"]),
