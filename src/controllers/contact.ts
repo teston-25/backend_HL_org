@@ -4,15 +4,16 @@ import prisma from "../config/prisma";
 
 // controller function for contact form submission
 export const createContact = catchAsync(async (req: Request, res: Response) => {
-  const { name, email, subject, message, type } = req.body;
+  const { name, email, phone_number, subject, message, type } = req.body;
 
   const contact = await prisma.contact.create({
     data: {
       name,
       email,
+      phone_number,
       subject,
       message,
-      type: type || "general",
+      type: type || "general inquiry",
       created_at: new Date(),
     },
   });
@@ -25,6 +26,7 @@ export const createContact = catchAsync(async (req: Request, res: Response) => {
         id: contact.id,
         name: contact.name,
         email: contact.email,
+        phone_number: contact.phone_number,
         subject: contact.subject,
         message: contact.message,
         type: contact.type,
