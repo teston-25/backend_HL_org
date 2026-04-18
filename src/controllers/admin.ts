@@ -230,6 +230,14 @@ export const updateMyPassword = catchAsync(
       data: { password_hash: hashedNewPassword },
     });
 
+    await createAuditLog(
+      req.admin.id,
+      "UPDATE",
+      "ADMIN",
+      req.admin.id,
+      "Updated own password",
+    );
+
     res.json({
       status: "success",
       message: "Password updated successfully",

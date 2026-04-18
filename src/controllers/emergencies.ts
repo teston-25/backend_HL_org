@@ -2,9 +2,18 @@ import { Request, Response } from "express";
 import prisma from "../config/prisma";
 import catchAsync from "../services/catchAsync";
 import AppError from "../services/AppError";
+import { createAuditLog } from "../services/auditLog";
+
+interface AuthRequest extends Request {
+  admin?: {
+    id: number;
+    email: string;
+    role: string;
+  };
+}
 
 export const createEmergency = catchAsync(
-  async (req: Request, res: Response) => {
+  async (req: AuthRequest, res: Response) => {
     const {
       title,
       location,
@@ -38,6 +47,16 @@ export const createEmergency = catchAsync(
         image_url,
       },
     });
+
+    if (req.admin) {
+      await createAuditLog(
+        req.admin.id,
+        "CREATE",
+        "EMERGENCY",
+        emergency.id,
+        `Created emergency: ${title}`,
+      );
+    }
 
     res.status(201).json({
       status: "success",
@@ -122,7 +141,7 @@ export const getActiveEmergencies = catchAsync(
 );
 
 export const updateEmergency = catchAsync(
-  async (req: Request, res: Response) => {
+  async (req: AuthRequest, res: Response) => {
     const id = Number(req.params.id);
     const updateData = req.body;
 
@@ -148,21 +167,48 @@ export const updateEmergency = catchAsync(
       delete updateData.increment_amount;
     }
 
-    const emergency = await prisma.emergency.update({
+    let emergency = await prisma.emergency.update({
       where: { id },
       data: updateData,
     });
 
+    if (
+      emergency.raised_amount != null &&
+      emergency.goal_amount != null &&
+      emergency.goal_amount > 0 &&
+      emergency.raised_amount >= emergency.goal_amount &&
+      emergency.status !== "RESOLVED"
+    ) {
+      emergency = await prisma.emergency.update({
+        where: { id },
+        data: { status: "RESOLVED" },
+      });
+    }
+
+    if (req.admin) {
+      await createAuditLog(
+        req.admin.id,
+        "UPDATE",
+        "EMERGENCY",
+        emergency.id,
+        `Updated emergency: ${existingEmergency.title}`,
+      );
+    }
+
     res.json({
       status: "success",
-      message: "Emergency updated successfully",
+      message:
+        emergency.status === "RESOLVED" &&
+        existingEmergency.status !== "RESOLVED"
+          ? "Emergency auto-resolved — funding goal reached!"
+          : "Emergency updated successfully",
       data: { emergency },
     });
   },
 );
 
 export const deleteEmergency = catchAsync(
-  async (req: Request, res: Response) => {
+  async (req: AuthRequest, res: Response) => {
     const id = Number(req.params.id);
 
     const emergency = await prisma.emergency.findUnique({
@@ -176,6 +222,16 @@ export const deleteEmergency = catchAsync(
     await prisma.emergency.delete({
       where: { id },
     });
+
+    if (req.admin) {
+      await createAuditLog(
+        req.admin.id,
+        "DELETE",
+        "EMERGENCY",
+        id,
+        `Deleted emergency: ${emergency.title}`,
+      );
+    }
 
     res.status(204).json({
       status: "success",

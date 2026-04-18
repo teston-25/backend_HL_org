@@ -3,9 +3,18 @@ import cloudinary from "../config/cloudinary";
 import catchAsync from "../services/catchAsync";
 import prisma from "../config/prisma";
 import AppError from "../services/AppError";
+import { createAuditLog } from "../services/auditLog";
+
+interface AuthRequest extends Request {
+  admin?: {
+    id: number;
+    email: string;
+    role: string;
+  };
+}
 
 export const uploadTransparencyPDF = catchAsync(
-  async (req: Request, res: Response) => {
+  async (req: AuthRequest, res: Response) => {
     if (!req.file) {
       return res.status(400).json({
         status: "fail",
@@ -36,6 +45,16 @@ export const uploadTransparencyPDF = catchAsync(
       },
     });
 
+    if (req.admin) {
+      await createAuditLog(
+        req.admin.id,
+        "CREATE",
+        "TRANSPARENCY_FILE",
+        file.id,
+        `Uploaded transparency file: ${title}`,
+      );
+    }
+
     res.status(201).json({
       status: "success",
       data: file,
@@ -44,7 +63,7 @@ export const uploadTransparencyPDF = catchAsync(
 );
 
 export const updateTransparencyFile = catchAsync(
-  async (req: Request, res: Response) => {
+  async (req: AuthRequest, res: Response) => {
     const id = parseInt(req.params.id, 10);
     const { title, file_type, year } = req.body;
     const file = req.file;
@@ -102,6 +121,16 @@ export const updateTransparencyFile = catchAsync(
       data: updateData,
     });
 
+    if (req.admin) {
+      await createAuditLog(
+        req.admin.id,
+        "UPDATE",
+        "TRANSPARENCY_FILE",
+        updatedFile.id,
+        `Updated transparency file: ${updatedFile.title}`,
+      );
+    }
+
     res.status(200).json({
       status: "success",
       message: "File updated successfully",
@@ -111,7 +140,7 @@ export const updateTransparencyFile = catchAsync(
 );
 
 export const deleteTransparencyFile = catchAsync(
-  async (req: Request, res: Response) => {
+  async (req: AuthRequest, res: Response) => {
     const id = parseInt(req.params.id, 10);
 
     const file = await prisma.transparencyFile.findUnique({
@@ -139,6 +168,16 @@ export const deleteTransparencyFile = catchAsync(
     await prisma.transparencyFile.delete({
       where: { id },
     });
+
+    if (req.admin) {
+      await createAuditLog(
+        req.admin.id,
+        "DELETE",
+        "TRANSPARENCY_FILE",
+        id,
+        `Deleted transparency file: ${file.title}`,
+      );
+    }
 
     res.status(204).json({
       status: "success",

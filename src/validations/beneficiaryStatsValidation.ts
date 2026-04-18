@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const updateBeneficiaryStatsSchema = z.object({
-  total_beneficiaries: z.number().int().nonnegative().optional(),
-  countries_count: z.number().int().nonnegative().optional(),
-  water_projects: z.number().int().nonnegative().optional(),
+  total_beneficiaries: z.coerce.number().optional(),
+  countries_count: z.coerce.number().optional(),
+  water_projects: z.coerce.number().optional(),
 });

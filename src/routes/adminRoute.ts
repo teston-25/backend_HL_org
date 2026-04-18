@@ -4,6 +4,7 @@ import * as donationController from "../controllers/donation";
 import * as newsController from "../controllers/news";
 import * as emergenciesController from "../controllers/emergencies";
 import * as beneficiaryController from "../controllers/beneficiaryStats";
+import * as auditLogController from "../controllers/auditLog";
 import {
   deleteTransparencyFile,
   updateTransparencyFile,
@@ -58,6 +59,14 @@ router.post(
 
 // --- Protected ---
 router.use(authenticate);
+
+// --- Beneficiary stats ---
+router.put(
+  "/beneficiary-stats",
+  requireRole(["ADMIN", "SUPER_ADMIN"]),
+  validate(updateBeneficiaryStatsSchema),
+  beneficiaryController.updateBeneficiaryStats,
+);
 
 // --- Admin management ---
 router.post(
@@ -160,14 +169,6 @@ router.delete(
   emergenciesController.deleteEmergency,
 );
 
-// --- Beneficiary stats ---
-router.put(
-  "/beneficiary-stats",
-  requireRole(["ADMIN", "SUPER_ADMIN"]),
-  validate(updateBeneficiaryStatsSchema),
-  beneficiaryController.updateBeneficiaryStats,
-);
-
 // --- Transparency PDF ---
 router.post(
   "/transparency",
@@ -185,6 +186,13 @@ router.delete(
   "/transparency/:id",
   requireRole(["ADMIN", "SUPER_ADMIN"]),
   deleteTransparencyFile,
+);
+
+// --- Audit Logs ---
+router.get(
+  "/audit-logs",
+  requireRole(["ADMIN", "SUPER_ADMIN"]),
+  auditLogController.getAuditLogs,
 );
 
 export default router;
