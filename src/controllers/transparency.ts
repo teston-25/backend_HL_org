@@ -13,6 +13,55 @@ interface AuthRequest extends Request {
   };
 }
 
+export const getAllTransparencyFiles = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { year, file_type } = req.query;
+
+    // Optional filtering
+    const filters: any = {};
+
+    if (year) {
+      filters.year = Number(year);
+    }
+
+    if (file_type) {
+      filters.file_type = file_type;
+    }
+
+    const files = await prisma.transparencyFile.findMany({
+      where: filters,
+      orderBy: {
+        year: "desc",
+      },
+    });
+
+    res.status(200).json({
+      status: "success",
+      results: files.length,
+      data: files,
+    });
+  },
+);
+
+export const getTransparencyFile = catchAsync(
+  async (req: Request, res: Response) => {
+    const id = parseInt(req.params.id, 10);
+
+    const file = await prisma.transparencyFile.findUnique({
+      where: { id },
+    });
+
+    if (!file) {
+      throw new AppError("File not found", 404);
+    }
+
+    res.status(200).json({
+      status: "success",
+      data: file,
+    });
+  },
+);
+
 export const uploadTransparencyPDF = catchAsync(
   async (req: AuthRequest, res: Response) => {
     if (!req.file) {

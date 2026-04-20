@@ -12,6 +12,7 @@ import newsRouter from "./routes/newsRoute";
 import contactRouter from "./routes/contactRoute";
 import emergenciesRouter from "./routes/emergenciesRoute";
 import beneficiaryStatsRouter from "./routes/beneficiaryStatsRoute";
+import transparencyRouter from "./routes/transparencyRoute";
 
 import { globalErrorHandler } from "./middleware/errorHandler";
 
@@ -51,6 +52,7 @@ app.use("/api/v1/news", newsRouter);
 app.use("/api/v1/contacts", contactRouter);
 app.use("/api/v1/emergencies", emergenciesRouter);
 app.use("/api/v1/beneficiary-stats", beneficiaryStatsRouter);
+app.use("/api/v1/transparency", transparencyRouter);
 
 const PORT = process.env.PORT || 5001;
 

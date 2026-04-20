@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import prisma from "../config/prisma";
@@ -97,13 +97,15 @@ export const createAdmin = catchAsync(
       },
     });
 
-    await createAuditLog(
-      req.admin!.id,
-      "CREATE",
-      "ADMIN",
-      admin.id,
-      "Created new admin account",
-    );
+    if (req.admin) {
+      await createAuditLog(
+        req.admin.id,
+        "CREATE",
+        "ADMIN",
+        admin.id,
+        "Created new admin account",
+      );
+    }
 
     res.status(201).json({
       status: "success",
