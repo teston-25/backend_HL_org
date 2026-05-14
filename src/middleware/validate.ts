@@ -2,9 +2,9 @@ import { Request, Response, NextFunction } from "express";
 
 export const validate =
   (schema: any, property: "body" | "params" | "query" = "body") =>
-  (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const parsed = schema.parse(req[property]);
+      const parsed = await schema.parseAsync(req[property]);
       req[property] = parsed;
       next();
     } catch (error: any) {
