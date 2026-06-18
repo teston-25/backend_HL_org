@@ -23,10 +23,27 @@ const app = express();
 const swaggerDocument = YAML.load("./swagger.yaml");
 
 app.use(helmet());
+const allowedOrigins = [
+  process.env.CORS_ORIGIN,
+  "https://ui-hl-ngo.vercel.app",
+  "http://localhost:3000",
+].filter(Boolean) as string[];
+
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN || "http://localhost:5173",
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        console.error(`🛑 CORS Blocked origin: ${origin}`);
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "Accept"],
   }),
 );
 app.use(express.json({ limit: "10kb" }));
