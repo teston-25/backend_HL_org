@@ -22,7 +22,11 @@ env.validateEnv();
 const app = express();
 const swaggerDocument = YAML.load("./swagger.yaml");
 
+// 1. DISABLE EXPRESS ETags (Prevents automatic 304 revalidations globally)
+app.disable("etag");
+
 app.use(helmet());
+
 const allowedOrigins = [
   process.env.CORS_ORIGIN,
   "https://ui-hl-ngo.vercel.app",
@@ -46,8 +50,24 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization", "Accept"],
   }),
 );
+
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true, limit: "10kb" }));
+
+// 2. CACHE-BUSTING MIDDLEWARE (Forces fresh responses from CDNs & Browsers)
+const disableCaching = (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction,
+) => {
+  res.setHeader(
+    "Cache-Control",
+    "no-store, no-cache, must-revalidate, proxy-revalidate",
+  );
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
+  next();
+};
 
 app.use(
   "/api-docs",
@@ -63,6 +83,10 @@ app.use(
   }),
 );
 
+// Apply the cache-disabling middleware to all API version 1 routers
+app.use("/api/v1", disableCaching);
+
+// Your API Routes are now completely protected against caching
 app.use("/api/v1/donation", chapaRouter);
 app.use("/api/v1/admin", adminRouter);
 app.use("/api/v1/news", newsRouter);
