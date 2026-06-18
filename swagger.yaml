@@ -372,3 +372,44 @@ paths:
           description: File deleted
         "400":
           description: Error
+  /transparency:
+    get:
+      tags: [Transparency]
+      summary: Get all transparency files
+      parameters:
+        - in: query
+          name: year
+          schema:
+            type: integer
+          required: false
+          description: Filter by year
+        - in: query
+          name: file_type
+          schema:
+            type: string
+          required: false
+          description: Filter by file type
+      responses:
+        "200":
+          description: List of transparency files
+        "400":
+          description: Error
+
+  /transparency/{id}:
+    get:
+      tags: [Transparency]
+      summary: Get transparency file by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Transparency file ID
+      responses:
+        "200":
+          description: Transparency file details
+        "404":
+          description: File not found
+        "400":
+          description: Error

@@ -78,11 +78,11 @@ model Emergency {
 }
 
 model BeneficiaryStats {
-  id                  Int      @id @default(autoincrement())
-  total_beneficiaries Int
-  countries_count     Int
-  water_projects      Int
-  updated_at          DateTime @default(now()) @updatedAt
+  id                      Int      @id @default(autoincrement())
+  total_beneficiaries     Int      // Tracks patients assisted & treated locally (e.g., 125+)
+  international_referrals Int      // Tracks advanced global medical referrals processed (e.g., 23)
+  annual_target           Int      // Tracks projected annual patient capacity (e.g., 5,000+)
+  updated_at              DateTime @default(now()) @updatedAt
 }
 
 model TransparencyFile {
