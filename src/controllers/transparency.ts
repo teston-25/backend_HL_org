@@ -80,7 +80,8 @@ export const uploadTransparencyPDF = catchAsync(
     }
 
     const result = await cloudinary.uploader.upload(req.file.path, {
-      resource_type: "raw",
+      resource_type: "image",
+      format: "pdf",
       folder: "transparency_files",
       public_id: `Report_${Date.now()}`,
     });
