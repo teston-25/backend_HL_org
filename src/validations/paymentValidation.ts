@@ -28,6 +28,8 @@ export const initPaymentSchema = z
     title: z.string().max(100, "Title too long").optional(),
 
     description: z.string().max(255, "Description too long").optional(),
+
+    return_url: z.string().url("Return URL must be a valid URL").optional(),
   })
   .superRefine(async (data, ctx) => {
     const deliverable = await isEmailDeliverable(data.email);

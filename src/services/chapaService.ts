@@ -16,6 +16,7 @@ export async function initPayment(data: any) {
     phone_number,
     title,
     description,
+    return_url,
   } = data;
   if (!amount || !email) {
     throw new AppError("Amount and email are required", 400);
@@ -48,7 +49,7 @@ export async function initPayment(data: any) {
     phone_number,
     tx_ref,
     callback_url: `${process.env.BASE_URL}/api/v1/donation/payment-callback`,
-    return_url: `${process.env.BASE_URL}/payment-success`,
+    return_url: return_url || `${process.env.BASE_URL}/payment-success`,
     "customization[title]": title || "Payment for services",
     "customization[description]": description || "Complete your payment",
   };
