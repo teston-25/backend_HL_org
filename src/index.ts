@@ -29,7 +29,7 @@ app.use(helmet());
 
 const allowedOrigins = [
   process.env.CORS_ORIGIN,
-  "https://ui-hl-ngo.vercel.app",
+  "https://hibret-lebego.vercel.app",
   "http://localhost:3000",
 ].filter(Boolean) as string[];
 
