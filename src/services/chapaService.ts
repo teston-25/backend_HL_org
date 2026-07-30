@@ -109,16 +109,12 @@ export async function handleCallback(body: any) {
       },
     });
 
-    try {
-      await sendDonationConfirmation(
-        donation.email,
-        donation.first_name,
-        donation.amount,
-        donation.tx_ref,
-      );
-    } catch (error) {
-      console.error("Donation email failed:", error);
-    }
+    sendDonationConfirmation(
+      donation.email,
+      donation.first_name,
+      donation.amount,
+      donation.tx_ref,
+    ).catch((err) => console.error("Donation email failed:", err));
   }
 }
 

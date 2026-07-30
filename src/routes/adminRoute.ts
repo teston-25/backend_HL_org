@@ -55,10 +55,13 @@ router.post(
   validate(loginSchema),
   adminController.login,
 );
+router.post("/refresh", adminController.refreshToken);
 // router.post("/", validate(createAdminSchema), adminController.createAdmin);
 
 // --- Protected ---
 router.use(authenticate);
+
+router.post("/logout", adminController.logout);
 
 // --- Beneficiary stats ---
 router.put(

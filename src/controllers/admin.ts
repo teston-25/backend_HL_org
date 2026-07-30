@@ -1,10 +1,15 @@
 import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 import prisma from "../config/prisma";
 import catchAsync from "../services/catchAsync";
 import AppError from "../services/AppError";
 import { createAuditLog } from "../services/auditLog";
+import {
+  generateTokens,
+  saveRefreshToken,
+  rotateRefreshToken,
+  invalidateRefreshToken,
+} from "../services/tokenService";
 
 interface AuthRequest extends Request {
   admin?: {
@@ -27,17 +32,21 @@ export const login = catchAsync(async (req: Request, res: Response) => {
     throw new AppError("Invalid credentials", 401);
   }
 
-  const token = jwt.sign(
-    { id: admin.id, email: admin.email, role: admin.role },
-    process.env.JWT_SECRET!,
-    { expiresIn: "1d" },
-  );
+  const tokens = generateTokens({ id: admin.id, email: admin.email, role: admin.role });
+  await saveRefreshToken(admin.id, tokens.refreshToken);
+
+  res.cookie("refreshToken", tokens.refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
 
   await createAuditLog(admin.id, "LOGIN", "AUTH", admin.id, "Admin logged in");
 
   res.json({
     status: "success",
-    token,
+    accessToken: tokens.accessToken,
     data: {
       admin: {
         id: admin.id,
@@ -309,4 +318,30 @@ export const deleteContact = catchAsync(async (req: Request, res: Response) => {
     status: "success",
     message: "Contact deleted successfully",
   });
+});
+
+export const refreshToken = catchAsync(async (req: Request, res: Response) => {
+  const refreshTokenCookie = req.cookies?.refreshToken;
+  if (!refreshTokenCookie) {
+    throw new AppError("No refresh token", 401);
+  }
+
+  const tokens = await rotateRefreshToken(refreshTokenCookie);
+
+  res.cookie("refreshToken", tokens.refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
+
+  res.json({ status: "success", accessToken: tokens.accessToken });
+});
+
+export const logout = catchAsync(async (req: AuthRequest, res: Response) => {
+  if (req.admin) {
+    await invalidateRefreshToken(req.admin.id);
+  }
+  res.clearCookie("refreshToken");
+  res.json({ status: "success", message: "Logged out" });
 });
