@@ -27,9 +27,12 @@ describe("Auth Endpoints", () => {
 
       expect(response.status).toBe(200);
       expect(response.body.status).toBe("success");
-      expect(response.body.accessToken).toBeDefined();
+      expect(response.body.accessToken).toBeUndefined();
       expect(response.body.data.admin.email).toBe("admin@test.com");
-      expect(response.headers["set-cookie"]).toBeDefined();
+      const cookies = response.headers["set-cookie"];
+      expect(cookies).toBeDefined();
+      expect(cookies.some((c: string) => c.startsWith("accessToken"))).toBe(true);
+      expect(cookies.some((c: string) => c.startsWith("refreshToken"))).toBe(true);
     });
 
     it("should return 401 with invalid email", async () => {

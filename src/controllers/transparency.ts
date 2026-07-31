@@ -14,7 +14,7 @@ interface AuthRequest extends Request {
 }
 
 export const getAllTransparencyFiles = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const { year, file_type } = req.query;
 
     // Optional filtering

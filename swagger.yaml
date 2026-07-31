@@ -37,6 +37,16 @@ paths:
         "200":
           description: API is running
 
+  /health:
+    get:
+      tags: [Public]
+      summary: Health check with database connectivity check
+      responses:
+        "200":
+          description: API and database are healthy
+        "503":
+          description: Database is down or unreachable
+
   /admin/login:
     post:
       tags: [Authentication]

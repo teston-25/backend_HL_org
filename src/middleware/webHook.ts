@@ -4,7 +4,7 @@ import AppError from "../services/AppError";
 
 export const verifyChapaWebhook = (
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction,
 ) => {
   const secret = process.env.CHAPA_WEBHOOK_SECRET;

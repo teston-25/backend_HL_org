@@ -16,6 +16,7 @@ import beneficiaryStatsRouter from "./routes/beneficiaryStatsRoute";
 import transparencyRouter from "./routes/transparencyRoute";
 
 import { globalErrorHandler } from "./middleware/errorHandler";
+import prisma from "./config/prisma";
 
 dotenv.config();
 env.validateEnv();
@@ -77,13 +78,31 @@ app.use("/api/v1/emergencies", emergenciesRouter);
 app.use("/api/v1/beneficiary-stats", beneficiaryStatsRouter);
 app.use("/api/v1/transparency", transparencyRouter);
 
-app.get("/", (req, res) => {
+app.get("/", (_req, res) => {
   res.json({
     message: "Backend is running! Visit /api-docs for API documentation",
   });
 });
 
-app.all("*", (req, res, next) => {
+app.get("/health", async (_req, res) => {
+  try {
+    await Promise.race([
+      prisma.$queryRaw`SELECT 1`,
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("DB health check timed out")), 5000),
+      ),
+    ]);
+    res.json({ status: "ok", database: "up", timestamp: new Date().toISOString() });
+  } catch {
+    res.status(503).json({
+      status: "error",
+      database: "down",
+      timestamp: new Date().toISOString(),
+    });
+  }
+});
+
+app.all("*", (req, res, _next) => {
   res
     .status(404)
     .json({ status: "fail", message: `Cannot find ${req.originalUrl}` });

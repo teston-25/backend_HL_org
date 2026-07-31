@@ -26,7 +26,7 @@ export async function initPayment(data: any) {
     "TX-" + Date.now() + "-" + crypto.randomBytes(4).toString("hex");
 
   // Create donation record in database
-  const donation = await prisma.donation.create({
+  await prisma.donation.create({
     data: {
       amount: parseFloat(amount),
       email,

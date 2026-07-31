@@ -9,6 +9,8 @@ import {
   saveRefreshToken,
   rotateRefreshToken,
   invalidateRefreshToken,
+  accessCookieOptions,
+  refreshCookieOptions,
 } from "../services/tokenService";
 
 interface AuthRequest extends Request {
@@ -35,18 +37,13 @@ export const login = catchAsync(async (req: Request, res: Response) => {
   const tokens = generateTokens({ id: admin.id, email: admin.email, role: admin.role });
   await saveRefreshToken(admin.id, tokens.refreshToken);
 
-  res.cookie("refreshToken", tokens.refreshToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  });
+  res.cookie("refreshToken", tokens.refreshToken, refreshCookieOptions);
+  res.cookie("accessToken", tokens.accessToken, accessCookieOptions);
 
   await createAuditLog(admin.id, "LOGIN", "AUTH", admin.id, "Admin logged in");
 
   res.json({
     status: "success",
-    accessToken: tokens.accessToken,
     data: {
       admin: {
         id: admin.id,
@@ -57,7 +54,7 @@ export const login = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-export const getAdmins = catchAsync(async (req: AuthRequest, res: Response) => {
+export const getAdmins = catchAsync(async (_req: AuthRequest, res: Response) => {
   const admins = await prisma.admin.findMany({
     select: {
       id: true,
@@ -320,6 +317,22 @@ export const deleteContact = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+export const getMe = catchAsync(async (req: AuthRequest, res: Response) => {
+  if (!req.admin) {
+    throw new AppError("Authentication required", 401);
+  }
+
+  const admin = await prisma.admin.findUnique({
+    where: { id: req.admin.id },
+    select: { id: true, email: true, role: true },
+  });
+  if (!admin) {
+    throw new AppError("Admin not found", 404);
+  }
+
+  res.json({ status: "success", data: { admin } });
+});
+
 export const refreshToken = catchAsync(async (req: Request, res: Response) => {
   const refreshTokenCookie = req.cookies?.refreshToken;
   if (!refreshTokenCookie) {
@@ -328,20 +341,17 @@ export const refreshToken = catchAsync(async (req: Request, res: Response) => {
 
   const tokens = await rotateRefreshToken(refreshTokenCookie);
 
-  res.cookie("refreshToken", tokens.refreshToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  });
+  res.cookie("accessToken", tokens.accessToken, accessCookieOptions);
+  res.cookie("refreshToken", tokens.refreshToken, refreshCookieOptions);
 
-  res.json({ status: "success", accessToken: tokens.accessToken });
+  res.json({ status: "success" });
 });
 
 export const logout = catchAsync(async (req: AuthRequest, res: Response) => {
   if (req.admin) {
     await invalidateRefreshToken(req.admin.id);
   }
+  res.clearCookie("accessToken");
   res.clearCookie("refreshToken");
   res.json({ status: "success", message: "Logged out" });
 });

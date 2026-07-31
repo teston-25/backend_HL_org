@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 import prisma from "../config/prisma";
 import catchAsync from "../services/catchAsync";
 import AppError from "../services/AppError";
@@ -64,7 +64,7 @@ export const createNews = catchAsync(
   },
 );
 
-export const getNews = catchAsync(async (req: Request, res: Response) => {
+export const getNews = catchAsync(async (_req: Request, res: Response) => {
   const news = await prisma.news.findMany({
     select: {
       id: true,
