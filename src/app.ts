@@ -25,13 +25,16 @@ const app = express();
 const swaggerDocument = YAML.load("./swagger.yaml");
 
 app.disable("etag");
+app.set("trust proxy", 1);
 
 app.use(helmet());
 
 const allowedOrigins = [
   process.env.CORS_ORIGIN,
   "https://hibret-lebego.vercel.app",
+  "https://ui-hl-ngo.vercel.app",
   "http://localhost:3000",
+  "https://hl-ngo.vercel.app",
 ].filter(Boolean) as string[];
 
 app.use(

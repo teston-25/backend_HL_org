@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+import type { Request } from "express";
 import prisma from "../config/prisma";
 
 const ACCESS_SECRET = process.env.JWT_SECRET!;
@@ -61,18 +62,21 @@ export const invalidateRefreshToken = async (adminId: number) => {
   });
 };
 
-const isProduction = process.env.NODE_ENV === "production";
+export const getCookieOptions = (req: Request) => {
+  const secure = req.secure;
 
-export const accessCookieOptions = {
-  httpOnly: true,
-  secure: isProduction,
-  sameSite: (isProduction ? "none" : "lax") as "lax" | "none",
-  maxAge: 15 * 60 * 1000,
-};
-
-export const refreshCookieOptions = {
-  httpOnly: true,
-  secure: isProduction,
-  sameSite: (isProduction ? "none" : "lax") as "lax" | "none",
-  maxAge: 7 * 24 * 60 * 60 * 1000,
+  return {
+    accessToken: {
+      httpOnly: true,
+      secure,
+      sameSite: (secure ? "none" : "lax") as "lax" | "none",
+      maxAge: 15 * 60 * 1000,
+    },
+    refreshToken: {
+      httpOnly: true,
+      secure,
+      sameSite: (secure ? "none" : "lax") as "lax" | "none",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    },
+  };
 };

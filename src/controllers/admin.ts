@@ -9,8 +9,7 @@ import {
   saveRefreshToken,
   rotateRefreshToken,
   invalidateRefreshToken,
-  accessCookieOptions,
-  refreshCookieOptions,
+  getCookieOptions,
 } from "../services/tokenService";
 
 interface AuthRequest extends Request {
@@ -37,8 +36,9 @@ export const login = catchAsync(async (req: Request, res: Response) => {
   const tokens = generateTokens({ id: admin.id, email: admin.email, role: admin.role });
   await saveRefreshToken(admin.id, tokens.refreshToken);
 
-  res.cookie("refreshToken", tokens.refreshToken, refreshCookieOptions);
-  res.cookie("accessToken", tokens.accessToken, accessCookieOptions);
+  const cookieOptions = getCookieOptions(req);
+  res.cookie("refreshToken", tokens.refreshToken, cookieOptions.refreshToken);
+  res.cookie("accessToken", tokens.accessToken, cookieOptions.accessToken);
 
   await createAuditLog(admin.id, "LOGIN", "AUTH", admin.id, "Admin logged in");
 
@@ -341,8 +341,9 @@ export const refreshToken = catchAsync(async (req: Request, res: Response) => {
 
   const tokens = await rotateRefreshToken(refreshTokenCookie);
 
-  res.cookie("accessToken", tokens.accessToken, accessCookieOptions);
-  res.cookie("refreshToken", tokens.refreshToken, refreshCookieOptions);
+  const cookieOptions = getCookieOptions(req);
+  res.cookie("accessToken", tokens.accessToken, cookieOptions.accessToken);
+  res.cookie("refreshToken", tokens.refreshToken, cookieOptions.refreshToken);
 
   res.json({ status: "success" });
 });
@@ -351,7 +352,8 @@ export const logout = catchAsync(async (req: AuthRequest, res: Response) => {
   if (req.admin) {
     await invalidateRefreshToken(req.admin.id);
   }
-  res.clearCookie("accessToken");
-  res.clearCookie("refreshToken");
+  const cookieOptions = getCookieOptions(req);
+  res.clearCookie("accessToken", cookieOptions.accessToken);
+  res.clearCookie("refreshToken", cookieOptions.refreshToken);
   res.json({ status: "success", message: "Logged out" });
 });
