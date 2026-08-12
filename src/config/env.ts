@@ -1,6 +1,7 @@
 const requiredEnvVars = [
   "DATABASE_URL",
   "JWT_SECRET",
+  "JWT_REFRESH_SECRET",
   "CHAPA_SECRET_KEY",
   "BASE_URL",
   "CLOUDINARY_CLOUD_NAME",
