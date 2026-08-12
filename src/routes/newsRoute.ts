@@ -4,7 +4,7 @@ import { cacheControl } from "../middleware/cacheControl";
 
 const router = express.Router();
 
-router.get("/", cacheControl(300), newscontroller.getNews);
-router.get("/:id", cacheControl(300), newscontroller.getNewsById);
+router.get("/", cacheControl(60, 30), newscontroller.getNews);
+router.get("/:id", cacheControl(60, 30), newscontroller.getNewsById);
 
 export default router;

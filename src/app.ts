@@ -24,7 +24,7 @@ env.validateEnv();
 const app = express();
 const swaggerDocument = YAML.load("./swagger.yaml");
 
-app.disable("etag");
+app.set("etag", true);
 app.set("trust proxy", 1);
 
 app.use(helmet());
