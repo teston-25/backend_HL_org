@@ -8,7 +8,9 @@
     "start": "node dist/index.js",
     "dev": "cross-env NODE_ENV=development tsx watch src/index.ts",
     "build": "tsc",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev"
   },
@@ -20,6 +22,7 @@
     "axios": "^1.13.6",
     "bcryptjs": "^2.4.3",
     "cloudinary": "^2.9.0",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.6.1",
     "express": "^4.18.2",
@@ -35,17 +38,23 @@
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
+    "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/jsonwebtoken": "^9.0.5",
     "@types/multer": "^1.4.11",
     "@types/nodemailer": "^6.4.14",
     "@types/pg": "^8.10.9",
+    "@types/supertest": "^7.2.1",
+    "@types/swagger-ui-express": "^4.1.8",
+    "@types/yamljs": "^0.2.34",
     "cross-env": "^10.1.0",
     "nodemon": "^3.0.2",
     "prisma": "^5.7.1",
+    "supertest": "^7.2.2",
     "ts-node": "^10.9.1",
-    "tsx": "^4.21.0",
-    "typescript": "^5.3.3"
+    "tsx": "^4.23.1",
+    "typescript": "^5.3.3",
+    "vitest": "^4.1.10"
   }
 }

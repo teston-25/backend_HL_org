@@ -26,7 +26,7 @@ export async function initPayment(data: any) {
     "TX-" + Date.now() + "-" + crypto.randomBytes(4).toString("hex");
 
   // Create donation record in database
-  const donation = await prisma.donation.create({
+  await prisma.donation.create({
     data: {
       amount: parseFloat(amount),
       email,
@@ -109,16 +109,12 @@ export async function handleCallback(body: any) {
       },
     });
 
-    try {
-      await sendDonationConfirmation(
-        donation.email,
-        donation.first_name,
-        donation.amount,
-        donation.tx_ref,
-      );
-    } catch (error) {
-      console.error("Donation email failed:", error);
-    }
+    sendDonationConfirmation(
+      donation.email,
+      donation.first_name,
+      donation.amount,
+      donation.tx_ref,
+    ).catch((err) => console.error("Donation email failed:", err));
   }
 }
 

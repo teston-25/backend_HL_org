@@ -67,7 +67,7 @@ export const createEmergency = catchAsync(
 );
 
 export const getEmergencies = catchAsync(
-  async (req: Request, res: Response) => {
+  async (_req: Request, res: Response) => {
     const [emergencies, stats] = await Promise.all([
       prisma.emergency.findMany({
         orderBy: { created_at: "desc" },
@@ -121,7 +121,7 @@ export const getEmergencyById = catchAsync(
 );
 
 export const getActiveEmergencies = catchAsync(
-  async (req: Request, res: Response) => {
+  async (_req: Request, res: Response) => {
     // Fetch all emergencies with status ACTIVE
     const emergencies = await prisma.emergency.findMany({
       where: { status: "ACTIVE" },

@@ -18,7 +18,7 @@ export const getAllDonations = catchAsync(
 );
 
 export const getDonationStats = catchAsync(
-  async (req: Request, res: Response) => {
+  async (_req: Request, res: Response) => {
     const stats = await donationService.getDonationStats();
 
     res.json({

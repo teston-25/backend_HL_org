@@ -12,11 +12,12 @@ interface AuthRequest extends Request {
 
 export const authenticate = (
   req: AuthRequest,
-  res: Response,
+  _res: Response,
   next: NextFunction,
 ) => {
   try {
-    const token = req.headers.authorization?.replace("Bearer ", "");
+    const token =
+      req.headers.authorization?.replace("Bearer ", "") || req.cookies?.accessToken;
     if (!token) {
       throw new AppError("No token provided", 401);
     }
@@ -35,7 +36,7 @@ export const authenticate = (
 };
 
 export const requireRole = (roles: string | string[]) => {
-  return (req: AuthRequest, res: Response, next: NextFunction) => {
+  return (req: AuthRequest, _res: Response, next: NextFunction) => {
     if (!req.admin) {
       return next(new AppError("Authentication required", 401));
     }
