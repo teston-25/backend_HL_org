@@ -11,6 +11,7 @@ import {
   uploadTransparencyPDF,
 } from "../controllers/transparency";
 import multer from "multer";
+import * as uploadController from "../controllers/upload";
 
 import { authenticate, requireRole } from "../middleware/auth";
 import { validate } from "../middleware/validate";
@@ -44,6 +45,18 @@ const upload = multer({
       cb(null, true);
     } else {
       cb(new AppError("Only PDF files are allowed", 400) as any, false);
+    }
+  },
+});
+
+const uploadImage = multer({
+  dest: "uploads/",
+  limits: { fileSize: 10 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    if (file.mimetype.startsWith("image/")) {
+      cb(null, true);
+    } else {
+      cb(new AppError("Only image files are allowed", 400) as any, false);
     }
   },
 });
@@ -173,14 +186,21 @@ router.delete(
   emergenciesController.deleteEmergency,
 );
 
+// --- Image upload ---
+router.post(
+  "/upload",
+  requireRole(["ADMIN", "SUPER_ADMIN"]),
+  uploadImage.single("file"),
+  uploadController.uploadImage,
+);
+
 // --- Transparency PDF ---
 router.post(
   "/transparency",
   requireRole(["ADMIN", "SUPER_ADMIN"]),
   upload.single("file"),
   uploadTransparencyPDF,
-);
-router.put(
+);router.put(
   "/transparency/:id",
   requireRole(["ADMIN", "SUPER_ADMIN"]),
   upload.single("file"),

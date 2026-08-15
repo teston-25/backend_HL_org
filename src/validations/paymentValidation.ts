@@ -29,6 +29,8 @@ export const initPaymentSchema = z
 
     description: z.string().max(255, "Description too long").optional(),
 
+    emergency_id: z.number().int().positive().optional(),
+
     return_url: z.string().url("Return URL must be a valid URL").optional(),
   })
   .superRefine(async (data, ctx) => {
