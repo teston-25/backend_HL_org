@@ -59,6 +59,38 @@ paths:
         "400":
           description: Error
 
+  /admin/refresh:
+    post:
+      tags: [Authentication]
+      summary: Refresh admin token
+      requestBody:
+        required: true
+      responses:
+        "200":
+          description: Token refreshed
+        "400":
+          description: Error
+
+  /admin/me:
+    get:
+      tags: [Admin]
+      summary: Get current admin
+      responses:
+        "200":
+          description: Current admin details
+        "400":
+          description: Error
+
+  /admin/logout:
+    post:
+      tags: [Authentication]
+      summary: Admin logout
+      responses:
+        "200":
+          description: Logout successful
+        "400":
+          description: Error
+
   /admin:
     get:
       tags: [Admin]
@@ -382,6 +414,29 @@ paths:
           description: File deleted
         "400":
           description: Error
+
+  /admin/upload:
+    post:
+      tags: [Admin]
+      summary: Upload image
+      requestBody:
+        required: true
+      responses:
+        "200":
+          description: Image uploaded
+        "400":
+          description: Error
+
+  /admin/audit-logs:
+    get:
+      tags: [Admin]
+      summary: Get audit logs
+      responses:
+        "200":
+          description: List of audit logs
+        "400":
+          description: Error
+
   /transparency:
     get:
       tags: [Transparency]

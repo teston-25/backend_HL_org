@@ -33,7 +33,11 @@ export const login = catchAsync(async (req: Request, res: Response) => {
     throw new AppError("Invalid credentials", 401);
   }
 
-  const tokens = generateTokens({ id: admin.id, email: admin.email, role: admin.role });
+  const tokens = generateTokens({
+    id: admin.id,
+    email: admin.email,
+    role: admin.role,
+  });
   await saveRefreshToken(admin.id, tokens.refreshToken);
 
   const cookieOptions = getCookieOptions(req);
@@ -54,23 +58,25 @@ export const login = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-export const getAdmins = catchAsync(async (_req: AuthRequest, res: Response) => {
-  const admins = await prisma.admin.findMany({
-    select: {
-      id: true,
-      email: true,
-      role: true,
-      created_at: true,
-      updated_at: true,
-    },
-  });
+export const getAdmins = catchAsync(
+  async (_req: AuthRequest, res: Response) => {
+    const admins = await prisma.admin.findMany({
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        created_at: true,
+        updated_at: true,
+      },
+    });
 
-  res.json({
-    status: "success",
-    result: admins.length,
-    data: { admins },
-  });
-});
+    res.json({
+      status: "success",
+      result: admins.length,
+      data: { admins },
+    });
+  },
+);
 
 export const createAdmin = catchAsync(
   async (req: AuthRequest, res: Response) => {

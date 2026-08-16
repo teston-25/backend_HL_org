@@ -35,6 +35,7 @@ const allowedOrigins = [
   "https://ui-hl-ngo.vercel.app",
   "http://localhost:3000",
   "https://hl-ngo.vercel.app",
+  "https://hebretlebego.org",
 ].filter(Boolean) as string[];
 
 app.use(
@@ -95,7 +96,11 @@ app.get("/health", async (_req, res) => {
         setTimeout(() => reject(new Error("DB health check timed out")), 5000),
       ),
     ]);
-    res.json({ status: "ok", database: "up", timestamp: new Date().toISOString() });
+    res.json({
+      status: "ok",
+      database: "up",
+      timestamp: new Date().toISOString(),
+    });
   } catch {
     res.status(503).json({
       status: "error",

@@ -200,7 +200,8 @@ router.post(
   requireRole(["ADMIN", "SUPER_ADMIN"]),
   upload.single("file"),
   uploadTransparencyPDF,
-);router.put(
+);
+router.put(
   "/transparency/:id",
   requireRole(["ADMIN", "SUPER_ADMIN"]),
   upload.single("file"),
