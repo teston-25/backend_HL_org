@@ -14,6 +14,7 @@ import contactRouter from "./routes/contactRoute";
 import emergenciesRouter from "./routes/emergenciesRoute";
 import beneficiaryStatsRouter from "./routes/beneficiaryStatsRoute";
 import transparencyRouter from "./routes/transparencyRoute";
+import mediaRouter from "./routes/mediaRoute";
 
 import { globalErrorHandler } from "./middleware/errorHandler";
 import prisma from "./config/prisma";
@@ -81,6 +82,7 @@ app.use("/api/v1/contacts", contactRouter);
 app.use("/api/v1/emergencies", emergenciesRouter);
 app.use("/api/v1/beneficiary-stats", beneficiaryStatsRouter);
 app.use("/api/v1/transparency", transparencyRouter);
+app.use("/api/v1/media", mediaRouter);
 
 app.get("/", (_req, res) => {
   res.json({
