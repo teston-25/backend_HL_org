@@ -3,7 +3,7 @@ node_modules/
   
 # Build output  
 dist/  
-  
+prisma/seed.ts  
 # Environment variables  
 .env  
 .env.local  

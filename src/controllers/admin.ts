@@ -323,6 +323,22 @@ export const deleteContact = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+export const markContactAsRead = catchAsync(
+  async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    const contact = await prisma.contact.update({
+      where: { id: parseInt(id) },
+      data: { is_read: true },
+    });
+
+    res.json({
+      status: "success",
+      data: { contact },
+    });
+  },
+);
+
 export const getMe = catchAsync(async (req: AuthRequest, res: Response) => {
   if (!req.admin) {
     throw new AppError("Authentication required", 401);

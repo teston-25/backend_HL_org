@@ -80,8 +80,7 @@ export const uploadTransparencyPDF = catchAsync(
     }
 
     const result = await cloudinary.uploader.upload(req.file.path, {
-      resource_type: "image",
-      format: "pdf",
+      resource_type: "raw",
       folder: "transparency_files",
       public_id: `Report_${Date.now()}`,
     });
@@ -204,16 +203,21 @@ export const deleteTransparencyFile = catchAsync(
       });
     }
 
-    // Delete from Cloudinary
-    const urlParts = file.file_url.split("/");
-    const publicId = urlParts
-      .slice(-2)
-      .join("/")
-      .replace(/\.[^/.]+$/, "");
+    // Delete from Cloudinary (best-effort — never block deletion of the DB
+    // row if Cloudinary cleanup fails, e.g. for legacy image-typed uploads).
+    try {
+      const urlParts = file.file_url.split("/");
+      const publicId = urlParts
+        .slice(-2)
+        .join("/")
+        .replace(/\.[^/.]+$/, "");
 
-    await cloudinary.uploader.destroy(publicId, {
-      resource_type: "raw",
-    });
+      await cloudinary.uploader.destroy(publicId, {
+        resource_type: "raw",
+      });
+    } catch (cloudinaryError) {
+      console.error("Cloudinary delete failed (ignored):", cloudinaryError);
+    }
 
     await prisma.transparencyFile.delete({
       where: { id },

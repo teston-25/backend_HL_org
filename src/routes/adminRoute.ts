@@ -92,6 +92,18 @@ router.post(
   validate(createAdminSchema),
   adminController.createAdmin,
 );
+// --- Password update for all admins (must be before /:id) ---
+router.put(
+  "/password/me",
+  requireRole(["ADMIN", "SUPER_ADMIN"]),
+  validate(updatePasswordSchema),
+  adminController.updateMyPassword,
+);
+router.get(
+  "/",
+  requireRole(["ADMIN", "SUPER_ADMIN"]),
+  adminController.getAdmins,
+);
 router.put(
   "/:id",
   requireRole("SUPER_ADMIN"),
@@ -106,19 +118,6 @@ router.delete(
   adminController.deleteAdmin,
 );
 
-// --- Password update for all admins ---
-router.get(
-  "/",
-  requireRole(["ADMIN", "SUPER_ADMIN"]),
-  adminController.getAdmins,
-);
-router.put(
-  "/password/me",
-  requireRole(["ADMIN", "SUPER_ADMIN"]),
-  validate(updatePasswordSchema),
-  adminController.updateMyPassword,
-);
-
 // --- Contacts (Admin + Super Admin) ---
 router.get(
   "/contacts",
@@ -129,6 +128,11 @@ router.get(
   "/contacts/:id",
   requireRole(["ADMIN", "SUPER_ADMIN"]),
   adminController.getContact,
+);
+router.patch(
+  "/contacts/:id/read",
+  requireRole(["ADMIN", "SUPER_ADMIN"]),
+  adminController.markContactAsRead,
 );
 router.delete(
   "/contacts/:id",

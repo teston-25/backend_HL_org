@@ -48,6 +48,7 @@ model Contact {
   subject    String
   message    String
   type       String // general/volunteer/etc
+  is_read    Boolean  @default(false)
   created_at DateTime @default(now())
 }
 
