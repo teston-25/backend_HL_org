@@ -1,3 +1,8 @@
+if (globalThis.fetch) {
+  // @ts-ignore
+  delete globalThis.fetch;
+}
+
 import app from "./app";
 
 const PORT = process.env.PORT || 5001;

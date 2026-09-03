@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "Backend for Hibret Lebego project",
   "main": "dist/index.js",
-  "type": "module",
   "scripts": {
-    "start": "npm run build && cross-env NODE_ENV=production node dist/index.js",
+    "start": "NODE_ENV=production NODE_OPTIONS='--no-experimental-fetch --max-old-space-size=512' node dist/index.js",
+    "postinstall": "prisma generate",
     "dev": "cross-env NODE_ENV=development tsx watch src/index.ts",
     "build": "tsc",
     "test": "vitest run",
@@ -33,9 +33,9 @@
     "nodemailer": "^6.9.7",
     "pg": "^8.11.3",
     "swagger-ui-express": "^5.0.1",
-    "typescript": "^5.3.3",
     "yamljs": "^0.3.0",
-    "zod": "^4.3.6"
+    "zod": "^4.3.6",
+    "prisma": "^5.7.1"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
@@ -52,10 +52,10 @@
     "@types/yamljs": "^0.2.34",
     "cross-env": "^10.1.0",
     "nodemon": "^3.0.2",
-    "prisma": "^5.7.1",
     "supertest": "^7.2.2",
     "ts-node": "^10.9.1",
     "tsx": "^4.23.1",
+    "typescript": "^5.3.3",
     "vitest": "^4.1.10"
   }
 }
